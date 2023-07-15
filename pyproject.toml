@@ -1,0 +1,19 @@
+[project]
+name = "pypwn"
+version = "0.1.1"
+authors = [
+  { name="lim8en1", email="lim8en1@proton.me" },
+]
+description = "pwnlib wrappers for CTFs"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = ["pwntools", "loguru", "validators"]
+
+[project.urls]
+"Homepage" = "https://github.com/lim8en1/pypwn"
+"Bug Tracker" = "https://github.com/lim8en1/pypwn/issues"
