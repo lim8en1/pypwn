@@ -1,13 +1,13 @@
 import typing
 from typing import Optional
 
-from core.abstract.module import AbstractModule
-from core.abstract.process import AbstractProcess
-from core.protocols import IElfFile, ITarget, IRop
+from pypwn.core.abstract.module import AbstractModule
+from pypwn.core.abstract.process import AbstractProcess
+from pypwn.core.protocols import IElfFile, ITarget, IRop
 from pwn import p64, u64
 from loguru import logger
 
-from modules.find_function import FindFunction, Method
+from pypwn.modules.find_function import FindFunction, Method
 
 
 class GetLibcAddress(AbstractModule):

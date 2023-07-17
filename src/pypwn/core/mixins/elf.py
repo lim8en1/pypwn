@@ -6,6 +6,15 @@ from pwnlib.elf.elf import dotdict
 
 
 class _ElfFile:
+    @typing.overload
+    def __init__(self, file: pathlib.Path, main_function_name: str): ...
+
+    @typing.overload
+    def __init__(self, file: pathlib.Path, main_function_address: int): ...
+
+    @typing.overload
+    def __init__(self, file: pathlib.Path): ...
+
     def __init__(self, file: pathlib.Path, main: str | int | None = None):
         if not file.exists() or not file.is_file():
             raise ValueError(f'Illegal file path [{file}]')

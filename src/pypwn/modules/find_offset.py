@@ -4,9 +4,9 @@ from loguru import logger
 
 from pwnlib.util.cyclic import cyclic, cyclic_find
 
-from core.abstract.module import AbstractModule
-from core.abstract.process import AbstractProcess
-from core.protocols import IDebuggable, ITarget
+from pypwn.core.abstract.module import AbstractModule
+from pypwn.core.abstract.process import AbstractProcess
+from pypwn.core.protocols import IDebuggable, ITarget
 
 
 class FindOffset(AbstractModule):
@@ -44,7 +44,7 @@ class FindOffset(AbstractModule):
             logger.info(f'Generating payload, size={hex(max_offset)}')
             payload = cyclic(max_offset)
             logger.info(f'Running main...')
-            process(target, payload)
+            process(payload)
             if not sighandler_done.wait(timeout=cls.thread_timeout):
                 logger.critical("Failed to trigger overflow")
             logger.info("Cleaning up gdb")

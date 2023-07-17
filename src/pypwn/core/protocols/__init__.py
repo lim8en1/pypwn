@@ -1,9 +1,9 @@
 import typing
 
-from core.mixins.elf import _ElfFile
-from core.mixins.libc import _LibcFile
-from core.mixins.rop import _RopFile
-from utils.gdb_wrapper import GdbWrapper
+from pypwn.core.mixins.elf import _ElfFile
+from pypwn.core.mixins.libc import _LibcFile
+from pypwn.core.mixins.rop import _RopFile
+from pypwn.utils.gdb_wrapper import GdbWrapper
 
 
 class ILibc(typing.Protocol):

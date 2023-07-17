@@ -1,7 +1,7 @@
 import enum
 import typing
-from core.abstract.module import AbstractModule
-from core.protocols import ITarget, IElfFile
+from pypwn.core.abstract.module import AbstractModule
+from pypwn.core.protocols import ITarget, IElfFile
 from loguru import logger
 
 

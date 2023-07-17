@@ -1,5 +1,5 @@
-from core.abstract.module import AbstractModule
-from core.abstract.process import AbstractProcess
+from pypwn.core.abstract.module import AbstractModule
+from pypwn.core.abstract.process import AbstractProcess
 from pwn import p64
 from loguru import logger
 

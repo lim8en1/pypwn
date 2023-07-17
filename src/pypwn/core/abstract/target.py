@@ -38,3 +38,8 @@ class AbstractTarget(abc.ABC):
 
     def _leave(self, leave: bool) -> bytes:
         return b'B' * 8 if leave else b''
+
+    @property
+    @abc.abstractmethod
+    def channel(self):
+        raise NotImplementedError()

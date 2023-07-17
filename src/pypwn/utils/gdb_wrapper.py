@@ -1,5 +1,7 @@
 import pathlib
 import re
+from typing import overload
+
 from pwnlib import gdb
 from loguru import logger
 
@@ -46,7 +48,7 @@ class GdbApi:
         return self._debugger
 
     def resume(self):
-        self._debugger.continue_nowait()
+        self._debugger.execute('continue')
 
     def interrupt(self):
         self._debugger.interrupt_and_wait()
@@ -74,3 +76,15 @@ class GdbApi:
 
     def quit(self):
         self._debugger.quit()
+
+    @overload
+    def breakpoint(self, target_address: int): ...
+
+    @overload
+    def breakpoint(self, target_name: str): ...
+
+    def breakpoint(self, target: int | str):
+        if isinstance(target, int):
+            target = f"*{hex(target)}"
+        logger.info(f"Creating breakpoint at: {target}")
+        self._debugger.execute(f"break {target}")

@@ -6,6 +6,8 @@ import typing
 from loguru import logger
 from pwnlib.elf import ELF
 
+from pypwn.utils.libc_finder import LibcResult
+
 
 class _LibcFile:
     FunctionList = typing.Sequence[typing.Tuple[str, int]]
@@ -56,13 +58,14 @@ class _LibcFile:
             logger.success(f"libc@{hex(base)}")
         return True
 
-    def set_libc(self, libc_data: bytes):
+    def set_libc(self, libc: LibcResult):
         tmp_file = tempfile.NamedTemporaryFile('wb')
         logger.info(f"Saving libc data to {tmp_file.name}")
-        tmp_file.write(libc_data)
+        tmp_file.write(libc.data)
         tmp_file.flush()
         logger.info(f"Parsing libc symbols...")
         self._libc = ELF(tmp_file.name)
+        self._libc.address = libc.base
         self._libc_version_detected = True
 
 
