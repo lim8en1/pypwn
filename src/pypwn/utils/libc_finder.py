@@ -43,7 +43,8 @@ class LibcFinder:
     def find(cls, path: pathlib.Path, functions: FunctionList, result_filter: typing.Callable = None) -> LibcResult | None: ...
 
     @classmethod
-    def find(cls, resource: str | pathlib.Path, functions: FunctionList,
+    def find(cls, functions: FunctionList,
+             resource: str | pathlib.Path = pathlib.Path('/opt/libcdb/libc.db'),
              result_filter: typing.Callable = None) -> LibcResult | None:
         if isinstance(resource, pathlib.Path):
             if not resource.exists() or not resource.is_file():

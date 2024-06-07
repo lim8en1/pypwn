@@ -11,7 +11,7 @@ class RemoteTarget(AbstractTarget):
         return self._process
 
     def reconnect(self) -> None:
-        self._process = remote(self._config.ip.exploded, self._config.port)
+        self._process = remote(self._ip.exploded, self._port)
 
     def __init__(self, ip: ipaddress.IPv4Address, port: int):
         super().__init__()

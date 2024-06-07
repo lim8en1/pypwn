@@ -17,3 +17,7 @@ class AbstractProcess(abc.ABC):
     @property
     def channel(self) -> tube:
         return self._target.channel
+
+    @property
+    def target(self) -> AbstractTarget:
+        return self._target

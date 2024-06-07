@@ -13,7 +13,7 @@ class _LibcFile:
     FunctionList = typing.Sequence[typing.Tuple[str, int]]
 
     def __init__(self, libc: str | pathlib.Path | None = None):
-        self._libc_version_detected = False
+        self._libc_version_detected = True
         if isinstance(libc, str):
             # TODO: add load from db
             raise NotImplementedError()

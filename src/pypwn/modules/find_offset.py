@@ -5,7 +5,6 @@ from loguru import logger
 from pwnlib.util.cyclic import cyclic, cyclic_find
 
 from pypwn.core.abstract.module import AbstractModule
-from pypwn.core.abstract.process import AbstractProcess
 from pypwn.core.protocols import IDebuggable, ITarget
 
 
@@ -15,7 +14,7 @@ class FindOffset(AbstractModule):
     class __TargetType(ITarget, IDebuggable): ...
 
     @classmethod
-    def execute(cls, target: __TargetType, max_offset: int, process: AbstractProcess, *args, **kwargs) -> Optional:
+    def execute(cls, target: __TargetType, max_offset: int, *args, **kwargs) -> Optional:
         r = []
 
         def _signal_handler(event):
@@ -44,7 +43,7 @@ class FindOffset(AbstractModule):
             logger.info(f'Generating payload, size={hex(max_offset)}')
             payload = cyclic(max_offset)
             logger.info(f'Running main...')
-            process(payload)
+            target.process(payload)
             if not sighandler_done.wait(timeout=cls.thread_timeout):
                 logger.critical("Failed to trigger overflow")
             logger.info("Cleaning up gdb")

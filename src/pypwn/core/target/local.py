@@ -12,7 +12,7 @@ class LocalTarget(AbstractTarget):
         return self._process
 
     def reconnect(self) -> None:
-        self._process = process(str(self._config.file.absolute()))
+        self._process = process(self._args)
 
     def __init__(self, target_file: pathlib.Path, args: list = None):
         super().__init__()

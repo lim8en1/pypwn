@@ -25,7 +25,7 @@ class _ElfFile:
         elif isinstance(main, int):
             self._main_ptr = main
         else:
-            self._main_ptr = None
+            self._main_ptr = self._file.symbols.get('main', None)
         self._base_address = 0x0
 
     @property
@@ -43,6 +43,15 @@ class _ElfFile:
     @property
     def plt(self) -> dotdict:
         return self._file.plt
+
+    @property
+    def base_address(self) -> int:
+        return self._file.address
+
+    @base_address.setter
+    def base_address(self, new_base: int):
+        self._file.address = new_base
+        self._main_ptr += new_base
 
 
 class ElfFileMixin:

@@ -1,8 +1,9 @@
 import typing
 from typing import Optional
 
-from pypwn.core.abstract.module import AbstractModule
 from pypwn.core.abstract.process import AbstractProcess
+
+from pypwn.core.abstract.module import AbstractModule
 from pypwn.core.protocols import IElfFile, ITarget, IRop
 from pwn import p64, u64
 from loguru import logger
@@ -48,7 +49,7 @@ class GetLibcAddress(AbstractModule):
         payload = target.generate_payload(rop_chain, offset, leave, canary)
 
         logger.info(f"Sending payload. Payload size = {hex(len(payload))}")
-        process(payload)
+        process(process, payload)
         data = process.channel.recvline()
         data = data.strip(b'\n')
         if len(data) > 8:
