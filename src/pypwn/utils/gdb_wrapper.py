@@ -7,19 +7,22 @@ from loguru import logger
 
 
 class GdbWrapper:
-    def __init__(self, target: int | pathlib.Path | str):
+    def __init__(self, target: int | pathlib.Path | str, additional_args: str | None = None):
         self._debugger = None
+        kwargs = {}
+        if additional_args:
+            kwargs['gdb_args'] = additional_args.split()
         if isinstance(target, int):
             logger.debug(f'Attaching to pid {target}')
-            pid, debugger = gdb.attach(target, api=True)
+            pid, debugger = gdb.attach(target, api=True, **kwargs)
             self._debugger = GdbApi(debugger)
         elif isinstance(target, pathlib.Path):
             logger.debug(f'Starting {target.absolute()} in gdb')
-            proc = gdb.debug(str(target.absolute()), api=True)
+            proc = gdb.debug(str(target.absolute()), api=True, **kwargs)
             self._debugger = GdbApi(proc.gdb)
         elif isinstance(target, str):
             logger.debug(f'Starting {target} in gdb')
-            proc = gdb.debug(target, api=True)
+            proc = gdb.debug(target, api=True, **kwargs)
             self._debugger = GdbApi(proc.gdb)
 
     def __enter__(self):
@@ -76,6 +79,9 @@ class GdbApi:
 
     def quit(self):
         self._debugger.quit()
+
+    def execute(self, gdb_command: str) -> str:
+        return self._debugger.execute(gdb_command, to_string=True)
 
     @overload
     def breakpoint(self, target_address: int): ...

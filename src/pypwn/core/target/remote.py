@@ -13,8 +13,8 @@ class RemoteTarget(AbstractTarget):
     def reconnect(self) -> None:
         self._process = remote(self._ip.exploded, self._port)
 
-    def __init__(self, ip: ipaddress.IPv4Address, port: int):
-        super().__init__()
+    def __init__(self, ip: ipaddress.IPv4Address, port: int, illegal_symbols: set | None = None):
+        super().__init__(illegal_symbols=illegal_symbols)
         self._ip = ip
         self._port = port
         logger.info(f"Starting in REMOTE mode. Target: {self._ip}:{self._port}")

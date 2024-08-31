@@ -1,5 +1,7 @@
 import enum
 import typing
+
+from core.abstract.process import AbstractProcess
 from pypwn.core.abstract.module import AbstractModule
 from pypwn.core.protocols import ITarget, IElfFile
 from loguru import logger
@@ -15,7 +17,7 @@ class FindFunction(AbstractModule):
     class __TargetType(ITarget, IElfFile): ...
 
     @classmethod
-    def execute(cls, target: __TargetType, function_name: typing.Union[typing.AnyStr, typing.List[typing.AnyStr]],
+    def execute(cls, process: AbstractProcess, function_name: typing.Union[typing.AnyStr, typing.List[typing.AnyStr]],
                 method: Method = Method.SymbolTable, find_all: bool = False, *args, **kwargs) -> typing.Any:
         logger.info(f"Running {cls.__name__} module")
         if not isinstance(function_name, list):
@@ -24,7 +26,7 @@ class FindFunction(AbstractModule):
         results = {}
         if find_all:
             for function in function_name:
-                address = cls.execute(target, function, method)
+                address = cls.execute(process, function, method)
                 if address:
                     results[function] = address
             return results
@@ -32,13 +34,13 @@ class FindFunction(AbstractModule):
         address = None
         if method == Method.SymbolTable:
             logger.info("Checking out the symbol table")
-            container = target.elf.symbols
+            container = process.target.elf.symbols
         elif method == Method.PLT:
             logger.info("Checking out the procedure linkage table")
-            container = target.elf.plt
+            container = process.target.elf.plt
         elif method == Method.GOT:
             logger.info("Checking out the global offset table")
-            container = target.elf.got
+            container = process.target.elf.got
         else:
             logger.critical(f"Method not supported")
             return address

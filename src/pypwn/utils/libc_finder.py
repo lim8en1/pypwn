@@ -2,8 +2,11 @@ import gzip
 import pathlib
 import sqlite3
 import typing
+
+import requests
 import validators
 from loguru import logger
+
 
 
 class LibcResult:
@@ -14,7 +17,11 @@ class LibcResult:
             self._data = data
         elif validators.url(data):
             logger.info(f"Downloading libc from {data}")
-            raise NotImplementedError()
+            response = requests.get(data)
+            if response.ok:
+                self._data = response.content
+            else:
+                raise ValueError(f"Failed to download libc from {data}. Response code: {response.status_code}")
         else:
             raise ValueError("LibcResult data is of unsupported type")
 
@@ -36,11 +43,11 @@ class LibcFinder:
 
     @classmethod
     @typing.overload
-    def find(cls, url: str, functions: FunctionList, result_filter: typing.Callable = None) -> LibcResult | None: ...
+    def find(cls, functions: FunctionList, url: str, result_filter: typing.Callable = None) -> LibcResult | None: ...
 
     @classmethod
     @typing.overload
-    def find(cls, path: pathlib.Path, functions: FunctionList, result_filter: typing.Callable = None) -> LibcResult | None: ...
+    def find(cls, functions: FunctionList, path: pathlib.Path, result_filter: typing.Callable = None) -> LibcResult | None: ...
 
     @classmethod
     def find(cls, functions: FunctionList,
@@ -64,10 +71,22 @@ class LibcFinder:
             results = result_filter(results)
 
         if len(results) > 0:
-            name, (data, base) = results.popitem()
-            if len(results):
-                logger.warning(f"Multiple possible libc versions found. Using {name}")
-            return LibcResult(name, base, data)
+            # name, (data, base) = results.popitem()
+            choice = 0
+            keys = tuple(results.keys())
+            if len(results) > 1:
+                logger.warning(f"Multiple possible libc versions found.")
+                for i, r in enumerate(keys):
+                    print(f'{i}: {r}')
+                user_input = input(f"Choose a libc to use (default: 0):")
+                try:
+                    choice = int(user_input)
+                except ValueError:
+                    pass
+            if choice not in range(len(keys)):
+                choice = 0
+            data, base = results[keys[choice]]
+            return LibcResult(keys[choice], base, data)
         return None
 
     @classmethod
@@ -118,4 +137,14 @@ class LibcFinder:
 
     @classmethod
     def _find_remote(cls, url: str, functions: FunctionList):
-        raise NotImplementedError()
+        results = {}
+        response = requests.post(url, json={"symbols": dict((x[0],hex(x[1])) for x in functions)})
+        if response.ok:
+            response_parsed = response.json()
+            if len(response_parsed) > 0:
+                for description in response_parsed:
+                    base = functions[0][1] - int(description["symbols"][functions[0][0]], 16)
+                    results[description['id']] = (description["download_url"], base)
+                    logger.info(f"Possible libc: {description['id']}@{hex(base)}")
+
+        return results

